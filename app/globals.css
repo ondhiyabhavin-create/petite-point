@@ -84,6 +84,24 @@ body {
   background-clip: text;
 }
 
+/* Performance optimizations */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* GPU acceleration for animations */
+[data-framer-component] {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize image rendering */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
 /* React DatePicker Styles */
 .react-datepicker-wrapper {
   width: 100%;

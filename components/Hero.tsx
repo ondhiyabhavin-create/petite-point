@@ -12,8 +12,21 @@ const backgroundImages = [
 
 export default function Hero() {
   const [currentImage, setCurrentImage] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; delay: number; duration: number }>>([]);
 
   useEffect(() => {
+    setIsLoaded(true);
+    
+    // Reduced particles for better performance
+    const generatedParticles = Array.from({ length: 8 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      delay: Math.random() * 2,
+      duration: Math.random() * 2 + 3,
+    }));
+    setParticles(generatedParticles);
+
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % backgroundImages.length);
     }, 5000);
@@ -29,18 +42,19 @@ export default function Hero() {
 
   return (
     <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image Carousel with Modern Effects */}
+      {/* Background Image Carousel - Optimized */}
       <div className="absolute inset-0">
         <AnimatePresence mode="wait">
           {backgroundImages.map((img, index) => (
             currentImage === index && (
               <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 1.1 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                key={`${img}-${index}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
                 className="absolute inset-0"
+                style={{ willChange: 'opacity' }}
               >
                 <Image
                   src={img}
@@ -49,60 +63,84 @@ export default function Hero() {
                   priority
                   className="object-cover"
                   sizes="100vw"
-                  quality={90}
+                  quality={85}
+                  loading="eager"
                 />
+                {/* Static Gradient Overlay - No animation for performance */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-900/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-900/20 via-transparent to-transparent" />
               </motion.div>
             )
           ))}
         </AnimatePresence>
       </div>
 
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-          backgroundSize: '40px 40px',
-        }} />
-      </div>
+      {/* Floating Particles - Reduced and Optimized */}
+      {isLoaded && particles.length > 0 && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ willChange: 'transform' }}>
+          {particles.map((particle) => (
+            <motion.div
+              key={particle.id}
+              className="absolute w-1.5 h-1.5 bg-white/15 rounded-full"
+              style={{ 
+                left: `${particle.x}%`,
+                willChange: 'transform',
+              }}
+              initial={{
+                y: '100vh',
+                opacity: 0,
+              }}
+              animate={{
+                y: '-10vh',
+                opacity: [0, 0.5, 0],
+              }}
+              transition={{
+                duration: particle.duration,
+                repeat: Infinity,
+                delay: particle.delay,
+                ease: "linear",
+              }}
+            />
+          ))}
+        </div>
+      )}
 
-      {/* Content with Modern Animations */}
+      {/* Content with Optimized Animations */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+        animate={{ opacity: isLoaded ? 1 : 0 }}
+        transition={{ duration: 0.6 }}
         className="relative z-10 text-center text-white px-4 max-w-5xl mx-auto"
       >
-        {/* Animated Badge */}
+        {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.8, type: "spring", stiffness: 100 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
           className="inline-block mb-6"
         >
-          <span className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-2 rounded-full text-sm font-semibold tracking-wider uppercase">
+          <span className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-2 rounded-full text-sm font-semibold tracking-wider uppercase inline-block">
             Pure Vegetarian Excellence
           </span>
         </motion.div>
 
-        {/* Main Heading with Stagger Animation */}
+        {/* Main Heading */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{ delay: 0.3, duration: 0.8 }}
           className="text-6xl md:text-8xl lg:text-9xl font-bold font-serif mb-6 leading-tight"
         >
-          <span className="block bg-gradient-to-r from-white via-primary-100 to-white bg-clip-text text-transparent animate-gradient">
+          <span className="block bg-gradient-to-r from-white via-primary-100 to-white bg-clip-text text-transparent">
             Petite Point
           </span>
         </motion.h1>
 
-        {/* Subtitle with Fade In */}
+        {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
           className="text-xl md:text-2xl lg:text-3xl mb-4 text-gray-200 font-light tracking-wide"
         >
           Where Tradition Meets Taste
@@ -110,17 +148,17 @@ export default function Hero() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
           className="text-lg md:text-xl text-gray-300 mb-12"
         >
           Pure Veg • Multi-Cuisine • Authentic Flavors
         </motion.p>
 
-        {/* Contact Info with Hover Effects */}
+        {/* Contact Info */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8 }}
+          transition={{ delay: 0.7, duration: 0.6 }}
           className="flex flex-col md:flex-row items-center justify-center gap-6 mb-10"
         >
           <motion.a
@@ -150,24 +188,24 @@ export default function Hero() {
           </motion.a>
         </motion.div>
 
-        {/* CTA Buttons with Modern Design */}
+        {/* CTA Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <motion.button
             onClick={() => scrollToSection('#menu')}
-            whileHover={{ scale: 1.05, y: -2 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="group relative bg-gradient-to-r from-primary-600 to-primary-700 text-white px-10 py-5 rounded-2xl text-lg font-bold shadow-2xl overflow-hidden"
           >
             <span className="relative z-10 flex items-center gap-2">
               View Menu
               <motion.span
-                animate={{ x: [0, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
+                animate={{ x: [0, 3, 0] }}
+                transition={{ repeat: Infinity, duration: 2 }}
               >
                 →
               </motion.span>
@@ -182,7 +220,7 @@ export default function Hero() {
           
           <motion.button
             onClick={() => scrollToSection('#contact')}
-            whileHover={{ scale: 1.05, y: -2 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="group bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border-2 border-white/30 hover:border-white/50 px-10 py-5 rounded-2xl text-lg font-bold transition-all shadow-xl"
           >
@@ -197,7 +235,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.4 }}
+          transition={{ delay: 1 }}
           className="flex items-center justify-center gap-2 mt-8"
         >
           {backgroundImages.map((_, index) => (
@@ -208,30 +246,39 @@ export default function Hero() {
                 currentImage === index ? 'w-8 bg-white' : 'w-2 bg-white/50'
               }`}
               aria-label={`Go to slide ${index + 1}`}
-            />
+            >
+              {currentImage === index && (
+                <motion.div
+                  layoutId="indicator"
+                  className="h-2 w-8 bg-white rounded-full"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+            </button>
           ))}
         </motion.div>
       </motion.div>
 
-      {/* Scroll Indicator with Modern Animation */}
+      {/* Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.6 }}
+        transition={{ delay: 1.2 }}
         className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
       >
         <motion.button
-          animate={{ y: [0, 10, 0] }}
+          animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
           onClick={() => scrollToSection('#about')}
           className="flex flex-col items-center gap-2 text-white group"
           aria-label="Scroll down"
+          whileHover={{ scale: 1.05 }}
         >
           <span className="text-sm font-semibold tracking-wider uppercase opacity-70 group-hover:opacity-100 transition-opacity">
             Scroll
           </span>
           <motion.div
-            animate={{ y: [0, 5, 0] }}
+            animate={{ y: [0, 4, 0] }}
             transition={{ repeat: Infinity, duration: 1.5 }}
             className="text-2xl"
           >

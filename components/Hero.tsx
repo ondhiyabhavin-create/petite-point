@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FaArrowDown, FaPhone, FaWhatsapp, FaPlay } from 'react-icons/fa';
-import Image from 'next/image';
 
 const backgroundImages = [
   '/images/hero/home.jpg',
@@ -13,23 +12,36 @@ const backgroundImages = [
 export default function Hero() {
   const [currentImage, setCurrentImage] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; delay: number; duration: number }>>([]);
+  const [imagesPreloaded, setImagesPreloaded] = useState(false);
 
+  // Preload all images for smooth transitions
   useEffect(() => {
-    setIsLoaded(true);
-    
-    // Reduced particles for better performance
-    const generatedParticles = Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      delay: Math.random() * 2,
-      duration: Math.random() * 2 + 3,
-    }));
-    setParticles(generatedParticles);
+    const preloadImages = async () => {
+      const imagePromises = backgroundImages.map((src) => {
+        return new Promise((resolve, reject) => {
+          const img = new window.Image();
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = src;
+        });
+      });
+      
+      try {
+        await Promise.all(imagePromises);
+        setImagesPreloaded(true);
+        setIsLoaded(true);
+      } catch (error) {
+        console.error('Error preloading images:', error);
+        setIsLoaded(true);
+      }
+    };
+
+    preloadImages();
 
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % backgroundImages.length);
     }, 5000);
+    
     return () => clearInterval(interval);
   }, []);
 
@@ -42,68 +54,31 @@ export default function Hero() {
 
   return (
     <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image Carousel - Optimized */}
+      {/* Background Image Carousel - Using CSS background for better control */}
       <div className="absolute inset-0">
-        <AnimatePresence mode="wait">
-          {backgroundImages.map((img, index) => (
-            currentImage === index && (
-              <motion.div
-                key={`${img}-${index}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="absolute inset-0"
-                style={{ willChange: 'opacity' }}
-              >
-                <Image
-                  src={img}
-                  alt={`Restaurant ${index + 1}`}
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="100vw"
-                  quality={85}
-                  loading="eager"
-                />
-                {/* Static Gradient Overlay - No animation for performance */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-900/20 via-transparent to-transparent" />
-              </motion.div>
-            )
-          ))}
-        </AnimatePresence>
+        {backgroundImages.map((img, index) => (
+          <div
+            key={img}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              currentImage === index ? 'opacity-100 z-0' : 'opacity-0 z-[-1] pointer-events-none'
+            }`}
+            style={{ 
+              willChange: 'opacity',
+              backfaceVisibility: 'hidden',
+              transform: 'translateZ(0)',
+              backgroundImage: `url(${img})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center center',
+              backgroundRepeat: 'no-repeat',
+              backgroundAttachment: 'fixed',
+            }}
+          >
+            {/* Static Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-900/20 via-transparent to-transparent" />
+          </div>
+        ))}
       </div>
-
-      {/* Floating Particles - Reduced and Optimized */}
-      {isLoaded && particles.length > 0 && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ willChange: 'transform' }}>
-          {particles.map((particle) => (
-            <motion.div
-              key={particle.id}
-              className="absolute w-1.5 h-1.5 bg-white/15 rounded-full"
-              style={{ 
-                left: `${particle.x}%`,
-                willChange: 'transform',
-              }}
-              initial={{
-                y: '100vh',
-                opacity: 0,
-              }}
-              animate={{
-                y: '-10vh',
-                opacity: [0, 0.5, 0],
-              }}
-              transition={{
-                duration: particle.duration,
-                repeat: Infinity,
-                delay: particle.delay,
-                ease: "linear",
-              }}
-            />
-          ))}
-        </div>
-      )}
 
       {/* Content with Optimized Animations */}
       <motion.div
@@ -242,19 +217,11 @@ export default function Hero() {
             <button
               key={index}
               onClick={() => setCurrentImage(index)}
-              className={`h-2 rounded-full transition-all ${
-                currentImage === index ? 'w-8 bg-white' : 'w-2 bg-white/50'
+              className={`h-2 rounded-full transition-all duration-300 ${
+                currentImage === index ? 'w-8 bg-white' : 'w-2 bg-white/50 hover:bg-white/70'
               }`}
               aria-label={`Go to slide ${index + 1}`}
-            >
-              {currentImage === index && (
-                <motion.div
-                  layoutId="indicator"
-                  className="h-2 w-8 bg-white rounded-full"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-            </button>
+            />
           ))}
         </motion.div>
       </motion.div>

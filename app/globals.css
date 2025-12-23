@@ -102,6 +102,54 @@ img {
   image-rendering: crisp-edges;
 }
 
+/* Smooth image transitions */
+.hero-image-transition {
+  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Prevent layout shifts during image transitions */
+section[id="home"] img {
+  will-change: opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Hero image container - ensure full coverage without cropping */
+section[id="home"] {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Background image handling - smooth and full coverage */
+section[id="home"] .absolute.inset-0 {
+  min-width: 100%;
+  min-height: 100%;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* Responsive background positioning */
+@media (max-width: 768px) {
+  section[id="home"] .absolute.inset-0 {
+    background-size: cover;
+    background-position: center center;
+  }
+}
+
+/* Ensure smooth transitions */
+section[id="home"] .absolute.inset-0 {
+  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 /* React DatePicker Styles */
 .react-datepicker-wrapper {
   width: 100%;

@@ -1,0 +1,42 @@
+{
+  "name": "petite-point",
+  "version": "1.0.0",
+  "description": "Petite Point Restaurant Website",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.2",
+    "@types/node": "^25.0.3",
+    "@types/react": "^19.2.7",
+    "@types/react-datepicker": "^6.2.0",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.182.0",
+    "aos": "^2.3.4",
+    "autoprefixer": "^10.4.23",
+    "framer-motion": "^12.23.26",
+    "gsap": "^3.14.2",
+    "locomotive-scroll": "^4.1.4",
+    "next": "^16.1.1",
+    "postcss": "^8.5.6",
+    "react": "^19.2.3",
+    "react-datepicker": "^9.1.0",
+    "react-dom": "^19.2.3",
+    "react-icons": "^5.5.0",
+    "swiper": "^12.0.3",
+    "tailwindcss": "^3.4.1",
+    "three": "^0.182.0",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/aos": "^3.0.7",
+    "eslint": "^9",
+    "eslint-config-next": "^16.1.1"
+  }
+}
